@@ -25,3 +25,7 @@ Search page
 FQA Page
 ![React](./src/images/web3.png)
 
+Add New Car Page
+![React](./src/images/web5.png)
+
+![React](./src/images/web6.png)

@@ -1,7 +1,7 @@
 import { Box, Container, CssBaseline, ThemeOptions } from "@material-ui/core";
 import red from "@material-ui/core/colors/red";
 import { ThemeProvider } from "@material-ui/core/styles";
-import { unstable_createMuiStrictModeTheme as createTheme } from '@material-ui/core';
+import { unstable_createMuiStrictModeTheme as createTheme } from "@material-ui/core";
 import axios from "axios";
 import type { AppProps } from "next/app";
 import Head from "next/head";
@@ -116,11 +116,11 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       palette: {
         type: "dark",
         primary: {
-          main:'#484848',
+          main: "#484848",
         },
         secondary: {
           main: "#ffffff",
-        }
+        },
       },
       overrides: {
         MuiCardActions: {
@@ -138,6 +138,13 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             marginTop: "2rem",
           },
         },
+        MuiFormLabel: {
+          root: {
+            "&$focused": {
+              color: "#ffffff",
+            },
+          },
+        }
       },
       props: {
         MuiCard: {
@@ -152,7 +159,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     setThemeState((prevState) => {
       return {
         ...prevState,
-        isDark: !prevState.isDark
+        isDark: !prevState.isDark,
       };
     });
   };
@@ -166,7 +173,11 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         />
       </Head>
       <ThemeProvider
-        theme={themeState.isDark ? createTheme(themeState.darkTheme as ThemeOptions) : createTheme(themeState.lightTheme as ThemeOptions)}
+        theme={
+          themeState.isDark
+            ? createTheme(themeState.darkTheme as ThemeOptions)
+            : createTheme(themeState.lightTheme as ThemeOptions)
+        }
       >
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
         <CssBaseline />
