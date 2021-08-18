@@ -3,7 +3,8 @@ import {
   Button,
   Container,
   Grid,
-  Paper, Typography
+  Paper,
+  Typography,
 } from "@material-ui/core";
 import FormControl from "@material-ui/core/FormControl";
 import IconButton from "@material-ui/core/IconButton";
@@ -13,6 +14,7 @@ import Select from "@material-ui/core/Select";
 import { makeStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@material-ui/icons/Delete";
 import ImageIcon from "@material-ui/icons/Image";
+import axios from "axios";
 import { Field, Form, Formik } from "formik";
 import { TextField } from "formik-material-ui";
 import React, { useState } from "react";
@@ -45,7 +47,7 @@ const AddCar = () => {
   };
   return (
     <Grid container direction="row" justifyContent="center">
-      <Grid item xs={12} sm={6} md={3}>
+      <Grid item xs={12} sm={6} md={4}>
         <Paper elevation={5}>
           <Container>
             <Formik
@@ -81,8 +83,17 @@ const AddCar = () => {
                 details: string().min(5).required("Required"),
                 price: number().required("Required"),
               })}
-              onSubmit={(values, actions) => {
+              onSubmit={async (values, actions) => {
                 const formData = new FormData();
+                const config = {
+                  headers: { "content-type": "multipart/form-data" },
+                  onUploadProgress: (event: ProgressEvent) => {
+                    console.log(
+                      `Current progress:`,
+                      Math.round((event.loaded * 100) / event.total)
+                    );
+                  },
+                };
                 formData.append("make", values.make);
                 formData.append("model", values.model);
                 formData.append("year", values.year);
@@ -93,7 +104,13 @@ const AddCar = () => {
                 for (let file of values.files) {
                   formData.append("theFiles", file);
                 }
-                console.log(JSON.stringify(formData))
+                const response = await axios.post(
+                  "/api/addCars",
+                  formData,
+                  config
+                );
+                console.log("response", response.data);
+
                 actions.resetForm();
               }}
             >
@@ -223,7 +240,7 @@ const AddCar = () => {
                                 container
                                 justifyContent="space-between"
                                 xs={12}
-                                md={6}
+                        
                                 key={index}
                                 alignItems="center"
                               >

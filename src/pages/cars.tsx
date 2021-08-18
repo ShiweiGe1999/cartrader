@@ -42,10 +42,10 @@ export default function CarList({
         <Grid item xs={12}>
           <CardPagination query={query} totalPages={totalPages} />
         </Grid>
-        {data?.cars.map((car) => {
+        {data?.cars.map((car,index) => {
           return (
             <Grid item xs={12} sm={6} key={car.id}>
-              <Media loading={isValidating} car={data?.cars[0]} />
+              <Media loading={isValidating} car={data?.cars[index]} />
             </Grid>
           );
         })}
