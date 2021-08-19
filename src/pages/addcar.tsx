@@ -20,6 +20,7 @@ import { TextField } from "formik-material-ui";
 import React, { useState } from "react";
 import { number, object, string } from "yup";
 import UploadButtons from "../components/UploadButtons";
+import router from "next/router";
 
 const useStyles = makeStyles({
   Avatar: {
@@ -84,34 +85,38 @@ const AddCar = () => {
                 price: number().required("Required"),
               })}
               onSubmit={async (values, actions) => {
-                const formData = new FormData();
-                const config = {
-                  headers: { "content-type": "multipart/form-data" },
-                  onUploadProgress: (event: ProgressEvent) => {
-                    console.log(
-                      `Current progress:`,
-                      Math.round((event.loaded * 100) / event.total)
-                    );
-                  },
-                };
-                formData.append("make", values.make);
-                formData.append("model", values.model);
-                formData.append("year", values.year);
-                formData.append("fuelType", values.fuelType);
-                formData.append("kilometers", values.kilometers);
-                formData.append("details", values.details);
-                formData.append("price", values.price);
-                for (let file of values.files) {
-                  formData.append("theFiles", file);
-                }
-                const response = await axios.post(
-                  "/api/addCars",
-                  formData,
-                  config
-                );
-                console.log("response", response.data);
+                try {
+                  const formData = new FormData();
+                  const config = {
+                    headers: { "content-type": "multipart/form-data" },
+                    onUploadProgress: (event: ProgressEvent) => {
+                      console.log(
+                        `Current progress:`,
+                        Math.round((event.loaded * 100) / event.total)
+                      );
+                    },
+                  };
+                  formData.append("make", values.make);
+                  formData.append("model", values.model);
+                  formData.append("year", values.year);
+                  formData.append("fuelType", values.fuelType);
+                  formData.append("kilometers", values.kilometers);
+                  formData.append("details", values.details);
+                  formData.append("price", values.price);
+                  for (let file of values.files) {
+                    formData.append("theFiles", file);
+                  }
+                  const response = await axios.post(
+                    "/api/addCars",
+                    formData,
+                    config
+                  );
+                  console.log("response", response.data);
 
-                actions.resetForm();
+                  actions.resetForm();
+                } catch (err) {
+                  router.push("./?message=Unauthorized");
+                }
               }}
             >
               {({ isSubmitting, values, errors, setFieldValue }) => {
@@ -240,7 +245,6 @@ const AddCar = () => {
                                 container
                                 justifyContent="space-between"
                                 xs={12}
-                        
                                 key={index}
                                 alignItems="center"
                               >

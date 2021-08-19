@@ -1,3 +1,16 @@
+-- USER
+
+CREATE TABLE User (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    email TEXT,
+    password TEXT
+);
+
+
+
+
+
 -- FAQ
 CREATE TABLE FAQ (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -51,3 +64,4 @@ INSERT INTO Car (make, model, year, kilometers, fuelType, price, photoUrl, detai
 -- Down
 DROP TABLE Car;
 DROP TABLE FAQ;
+DROP TABLE User;
