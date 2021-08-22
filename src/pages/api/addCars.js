@@ -19,7 +19,7 @@ const apiRoute = nextConnect({
 });
 
 apiRoute.use((req, res, next) => {
-  verify(req.headers.Authorization, secret, function (err, decoded) {
+  verify(req.cookies.auth, secret, function (err, decoded) {
     if (!err && decoded) {
       return next();
     }
@@ -30,12 +30,15 @@ apiRoute.use((req, res, next) => {
 apiRoute.use(upload.array("theFiles"));
 
 apiRoute.post((req, res) => {
-  req.body.photoUrl = req.files[0]
-    ? "./photos/cars/" + req.files[0].originalname
-    : null;
-  createCar(req.body);
-
-  res.status(200).json({ files: JSON.stringify(req.files) });
+  try {
+    req.body.photoUrl = "./photos/cars/" + req.files[0].originalname;
+    createCar(req.body);
+    res.status(200).json({ files: JSON.stringify(req.files) });
+  } catch (err) {
+    res
+      .status(401)
+      .json({ message: "Must at least have one picture uploaded" });
+  }
 });
 
 export default apiRoute;

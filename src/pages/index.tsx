@@ -9,10 +9,13 @@ import {
   Select,
   SelectProps,
 } from "@material-ui/core";
+import Typography from "@material-ui/core/Typography";
 import Alert from "@material-ui/lab/Alert";
 import { width } from "@material-ui/system";
+import axios from "axios";
 import { Field, Form, Formik, useField, useFormikContext } from "formik";
 import { GetServerSideProps } from "next";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import useSWR from "swr";
@@ -20,12 +23,12 @@ import { getMakes, Make } from "../database/getMakes";
 import { getModels, Model } from "../database/getModels";
 import { getAsString } from "../getAsString";
 import classes from "./index.module.css";
-
+import getUser from "./api/getuser";
 export interface SearchProps {
   makes: Make[];
   models: Model[];
   singleColumn?: boolean;
-  message: string;
+  message?: string;
 }
 
 const prices = [500, 1000, 5000, 15000, 25000, 50000];
@@ -47,7 +50,7 @@ export default function Search({
   return (
     <>
       {message ? (
-        <div style={{width:"100%", marginBottom: "2rem"}}>
+        <div style={{ width: "100%", marginBottom: "2rem" }}>
           <Alert severity="error">Please Login!</Alert>
         </div>
       ) : null}
@@ -145,6 +148,13 @@ export default function Search({
                     type="submit"
                   >
                     Search
+                  </Button>
+                </Grid>
+                <Grid item xs={12}>
+                  <Button color="primary" variant="contained" fullWidth>
+                    <Link href="/addcar">
+                      <a style={{ color: "white" }}>Add New Car</a>
+                    </Link>
                   </Button>
                 </Grid>
               </Grid>

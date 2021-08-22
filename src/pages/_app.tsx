@@ -1,15 +1,21 @@
-import { Box, Container, CssBaseline, ThemeOptions } from "@material-ui/core";
+import {
+  Container,
+  CssBaseline,
+  ThemeOptions,
+  unstable_createMuiStrictModeTheme as createTheme,
+} from "@material-ui/core";
 import red from "@material-ui/core/colors/red";
 import { ThemeProvider } from "@material-ui/core/styles";
-import { unstable_createMuiStrictModeTheme as createTheme } from "@material-ui/core";
 import axios from "axios";
-import type { AppProps } from "next/app";
 import Head from "next/head";
+import PropTypes from "prop-types";
 import React, { useState } from "react";
 import { SWRConfig } from "swr";
 import { Nav } from "../components/Nav";
-import PropTypes from "prop-types";
-
+import "./global.css";
+import App, { AppProps, AppContext } from "next/app";
+import { verify } from "jsonwebtoken";
+import { secret } from "../../api/secret";
 export const theme = createTheme({
   palette: {
     type: "light",
@@ -74,13 +80,14 @@ const darkTheme = createTheme({
     },
   },
 });
+
 export default function MyApp({ Component, pageProps }: AppProps) {
   const [themeState, setThemeState] = useState({
     lightTheme: {
       palette: {
         type: "light",
         primary: {
-          main: "#556cd6",
+          main: "#2196f3",
         },
         error: {
           main: red.A400,
@@ -144,7 +151,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
               color: "#ffffff",
             },
           },
-        }
+        },
       },
       props: {
         MuiCard: {
@@ -181,7 +188,11 @@ export default function MyApp({ Component, pageProps }: AppProps) {
       >
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
         <CssBaseline />
-        <Nav checked={themeState.isDark} onChange={handleChange} />
+        <Nav
+          checked={themeState.isDark}
+          onChange={handleChange}
+          userInfo={pageProps.userInfo}
+        />
 
         <SWRConfig
           value={{ fetcher: (url: string) => axios(url).then((r) => r.data) }}
@@ -195,6 +206,30 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   );
 }
 
+MyApp.getInitialProps = async (appContext: AppContext) => {
+  // calls page's `getInitialProps` and fills `appProps.pageProps`
+  try {
+    const appProps = await App.getInitialProps(appContext);
+    const cookie = appContext.ctx.req?.headers.cookie;
+    const res = await axios.get("http://localhost:3001/api/getuser", {
+      headers: cookie ? { cookie } : undefined,
+    });
+
+    return {
+      pageProps: {
+        ...appProps.pageProps,
+        userInfo: res.data,
+      },
+    };
+  } catch (err) {
+    const appProps = await App.getInitialProps(appContext);
+    return {
+      pageProps: {
+        ...appProps.pageProps,
+      },
+    };
+  }
+};
 MyApp.propTypes = {
   Component: PropTypes.elementType.isRequired,
   pageProps: PropTypes.object.isRequired,
