@@ -30,10 +30,10 @@ export default async function login(req: NextApiRequest, res: NextApiResponse) {
                 secure: process.env.NODE_ENV !== "development",
                 sameSite: "strict",
                 maxAge: 3600,
-                path: '/'
+                path: "/",
               })
             );
-            return res.json({ message: "Welcome to the app!" });
+            return res.json({ message: "Welcome to the app!", user });
           }
           res.json({ message: "Something wrong" });
         });

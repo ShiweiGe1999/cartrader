@@ -11,11 +11,15 @@ import Head from "next/head";
 import PropTypes from "prop-types";
 import React, { useState } from "react";
 import { SWRConfig } from "swr";
-import { Nav } from "../components/Nav";
+import Nav from "../components/Nav";
 import "./global.css";
 import App, { AppProps, AppContext } from "next/app";
 import { verify } from "jsonwebtoken";
 import { secret } from "../../api/secret";
+import { store } from "../redux/store";
+import { Provider, connect } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setUserInfo } from "../redux/UI";
 export const theme = createTheme({
   palette: {
     type: "light",
@@ -171,38 +175,40 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     });
   };
   return (
-    <React.Fragment>
-      <Head>
-        <title>Car Trader</title>
-        <meta
-          name="viewport"
-          content="minimum-scale=1, initial-scale=1, width=device-width"
-        />
-      </Head>
-      <ThemeProvider
-        theme={
-          themeState.isDark
-            ? createTheme(themeState.darkTheme as ThemeOptions)
-            : createTheme(themeState.lightTheme as ThemeOptions)
-        }
-      >
-        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-        <CssBaseline />
-        <Nav
-          checked={themeState.isDark}
-          onChange={handleChange}
-          userInfo={pageProps.userInfo}
-        />
-
-        <SWRConfig
-          value={{ fetcher: (url: string) => axios(url).then((r) => r.data) }}
+    <Provider store={store}>
+      <React.Fragment>
+        <Head>
+          <title>Car Trader</title>
+          <meta
+            name="viewport"
+            content="minimum-scale=1, initial-scale=1, width=device-width"
+          />
+        </Head>
+        <ThemeProvider
+          theme={
+            themeState.isDark
+              ? createTheme(themeState.darkTheme as ThemeOptions)
+              : createTheme(themeState.lightTheme as ThemeOptions)
+          }
         >
-          <Container maxWidth={false}>
-            <Component {...pageProps} />
-          </Container>
-        </SWRConfig>
-      </ThemeProvider>
-    </React.Fragment>
+          {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+          <CssBaseline />
+          <Nav
+            checked={themeState.isDark}
+            onChange={handleChange}
+            userInfo={pageProps.userInfo}
+          />
+
+          <SWRConfig
+            value={{ fetcher: (url: string) => axios(url).then((r) => r.data) }}
+          >
+            <Container maxWidth={false}>
+              <Component {...pageProps} />
+            </Container>
+          </SWRConfig>
+        </ThemeProvider>
+      </React.Fragment>
+    </Provider>
   );
 }
 

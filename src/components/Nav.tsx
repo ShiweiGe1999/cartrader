@@ -8,6 +8,11 @@ import axios from "axios";
 import { NextPageContext } from "next";
 import Link from "next/link";
 import React from "react";
+import { setUserInfo } from "../redux/UI";
+import { connect, useSelector, useDispatch } from "react-redux";
+import { RootState } from "../redux/store";
+import { useEffect } from "react";
+import { logout, login } from "../redux/UI";
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
     flexGrow: 1,
@@ -39,23 +44,34 @@ export interface NavProps {
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   userInfo?: any;
 }
-export function Nav({ checked, onChange, userInfo }: NavProps) {
+export default function Nav({
+  checked,
+  onChange,
+  userInfo,
+  ...props
+}: NavProps) {
   const classes = useStyles();
+  const user = useSelector((state: RootState) => state.UI.user);
+  const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
-
   const handleClose = () => {
     setAnchorEl(null);
   };
-
+  useEffect(() => {
+    if (userInfo) {
+      dispatch(login());
+      dispatch(setUserInfo(userInfo))
+    }
+  }, [userInfo, dispatch]);
   return (
     <AppBar position="static">
       <Toolbar variant="dense">
         <Typography variant="h6" className={classes.title}>
-          German Garage 
+          German Garage
         </Typography>
 
         <Button color="inherit">
@@ -72,7 +88,7 @@ export function Nav({ checked, onChange, userInfo }: NavProps) {
             </a>
           </Link>
         </Button>
-        {!userInfo && (
+        {!user.loggedIn && (
           <Button color="inherit">
             <Link href="/login">
               <a style={{ color: "white" }}>
@@ -81,7 +97,7 @@ export function Nav({ checked, onChange, userInfo }: NavProps) {
             </Link>
           </Button>
         )}
-        {!userInfo && (
+        {!user.loggedIn && (
           <Button color="inherit">
             <Link href="/signup">
               <a style={{ color: "white" }}>
@@ -91,7 +107,7 @@ export function Nav({ checked, onChange, userInfo }: NavProps) {
           </Button>
         )}
 
-        {userInfo && (
+        {user.loggedIn && (
           <div>
             <IconButton
               aria-label="account of current user"
@@ -119,6 +135,27 @@ export function Nav({ checked, onChange, userInfo }: NavProps) {
             >
               <MenuItem onClick={handleClose}>Profile</MenuItem>
               <MenuItem onClick={handleClose}>My account</MenuItem>
+              <MenuItem
+                onClick={() => {
+                  const res = axios
+                    .post(
+                      "http://localhost:3001/api/logout",
+                      {},
+                      {
+                        headers: {
+                          "Content-Type": "Application/json",
+                        },
+                      }
+                    )
+                    .then((res) => {
+                      dispatch(logout());
+                      handleClose();
+                      console.log(res.data);
+                    });
+                }}
+              >
+                Log Out
+              </MenuItem>
             </Menu>
           </div>
         )}
